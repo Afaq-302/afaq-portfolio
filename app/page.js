@@ -46,11 +46,11 @@ export default function Home() {
         <HeroSection />
       </section>
 
-      <section id="about" className="py-20">
+      <section id="about" className="">
         <AboutSection />
       </section>
 
-      <section id="skills" className="py-20 bg-white">
+      <section id="skills" className=" bg-white">
         <SkillsSection />
       </section>
 
@@ -58,11 +58,11 @@ export default function Home() {
         <ProjectsSection />
       </section>
 
-      <section id="testimonials" className="py-20 bg-white">
+      <section id="testimonials" className=" bg-white">
         <TestimonialsSection />
       </section>
 
-      <section id="contact" className="py-20">
+      <section id="contact" className="">
         <ContactSection />
       </section>
 
