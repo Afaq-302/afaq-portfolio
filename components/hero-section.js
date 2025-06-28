@@ -1,171 +1,183 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { motion } from "framer-motion"
-import { ArrowRight, Code, Database, Globe, ChevronDown } from "lucide-react"
+/* ---------------------------------------------------------------
+ *  HeroSection – mobile-first order, extra polish
+ * ------------------------------------------------------------- */
+import { useEffect, useRef } from "react"
+import { motion, useMotionValue, useTransform } from "framer-motion"
+import { ArrowRight, ChevronDown, Code, Database, Globe } from "lucide-react"
 import Typed from "typed.js"
 import Image from "next/image"
-import Picture from "../public/pic.jpg"
+import avatar from "../public/pic.jpg"
 
 export default function HeroSection() {
+  /* typewriter -------------------------------------------------- */
   const typedRef = useRef(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [viewport, setViewport] = useState({ width: 0, height: 0 })
-
   useEffect(() => {
-    const typed = new Typed(typedRef.current, {
+    const t = new Typed(typedRef.current, {
       strings: [
-        "Full Stack Developer",
-        "Frontend Magician",
-        "Shopify Expert",
-        "Next.js Enthusiast"
+        "Full-Stack&nbsp;Developer",
+        "Shopify&nbsp;Expert",
+        "Next.js&nbsp;Lover"
       ],
-      typeSpeed: 50,
+      typeSpeed: 60,
       backSpeed: 30,
-      backDelay: 1500,
-      loop: true,
+      backDelay: 1800,
+      loop: true
     })
-    return () => typed.destroy()
+    return () => t.destroy()
   }, [])
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const handleMouseMove = (e) => {
-        setMousePos({ x: e.clientX, y: e.clientY })
-      }
-      setViewport({ width: window.innerWidth, height: window.innerHeight })
-      window.addEventListener("mousemove", handleMouseMove)
-      return () => window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [])
-
-  const logoWiggle = {
-    rotate: [0, -10, 10, -10, 10, 0],
-    transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
-  }
-
-  const sparkleText = "relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-400 to-indigo-600 animate-text-glow"
-
-  const tiltX = ((mousePos.y - viewport.height / 2) / 60).toFixed(2)
-  const tiltY = ((mousePos.x - viewport.width / 2) / 60).toFixed(2)
+  /* parallax tilt ---------------------------------------------- */
+  const mX = useMotionValue(0)
+  const mY = useMotionValue(0)
+  const rX = useTransform(mY, [-50, 50], [-6, 6])
+  const rY = useTransform(mX, [-50, 50], [6, -6])
 
   return (
-    <div className="container mx-auto px-4 md:px-6 h-screen flex flex-col justify-center relative overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-10">
-        <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-          <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-1 w-12 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"></div>
-              <p className="text-blue-600 font-semibold tracking-wide uppercase">You're in elite territory</p>
-            </div>
+    <section
+      id="home"
+      className="relative flex min-h-screen flex-col justify-center overflow-hidden
++                 bg-gradient-to-br from-slate-50 via-white to-indigo-50
++                 pt-20 md:pt-0 px-6 md:px-14"
+      onMouseMove={e => {
+        mX.set(e.clientX - window.innerWidth / 2)
+        mY.set(e.clientY - window.innerHeight / 2)
+      }}
+    >
+      {/* blobs */}
+      <span className="pointer-events-none absolute -top-48 -left-48 h-[32rem] w-[32rem] rounded-full
+                       bg-indigo-400/20 blur-3xl" />
+      <span className="pointer-events-none absolute -bottom-48 -right-48 h-[32rem] w-[32rem] rounded-full
+                       bg-fuchsia-400/20 blur-3xl" />
 
-            <h1 className="text-5xl md:text-6xl font-black leading-tight tracking-tight">
-              Hi, I'm{" "}
-              <span className={sparkleText}>
-                Afaq Ahmad
-              </span>{" "}
+      {/* layout -------------------------------------------------- */}
+      <div className="container relative z-10 mx-auto flex flex-col items-center gap-16
+                      md:flex-row md:gap-32 xl:gap-60">
+        {/* text first on mobile */}
+        <motion.div
+          initial={{ opacity: 0, x: -60 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.9 }}
+          className="w-full text-center md:max-w-xl md:text-left"
+        >
+          <p className="mb-4 inline-block rounded-full bg-indigo-100 px-5 py-1.5 text-xs font-semibold tracking-widest text-indigo-600">
+            YOU’RE IN ELITE TERRITORY
+          </p>
 
-            </h1>
+         <h1 className="mb-5 text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
+            Hi, I’m{" "}
+            <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-fuchsia-600 bg-clip-text text-transparent">
+              Afaq&nbsp;Ahmad
+            </span>
+          </h1>
 
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-700">
-              A <span ref={typedRef} className="text-blue-600 underline underline-offset-4"></span>
-            </h2>
+         <h2 className="mb-8 text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-700">
+            <span ref={typedRef} className="underline decoration-indigo-500 underline-offset-4" />
+          </h2>
 
-            <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
-              I transform bold ideas into digital masterpieces. From pixel to performance, I craft interactive elegance.
-            </p>
+          <p className="mx-auto mb-12 max-w-lg text-lg text-slate-600 md:mx-0">
+            I engineer lightning-fast, accessible & immersive web experiences —
+            turning bold ideas into polished digital products your users love.
+          </p>
 
-            <div className="flex flex-wrap gap-4 pt-4">
-              <motion.a
-                href="#contact"
-                className="btn-primary group flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-700 to-indigo-600 text-white font-semibold shadow-lg hover:scale-105 transition-transform"
-              >
-                Hire Me
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-              </motion.a>
+          {/* CTAs ------------------------------------------------ */}
+          <div className="flex flex-wrap items-center justify-center gap-4 md:justify-start">
+            <a
+              href="#contact"
+              className="relative inline-flex items-center gap-2 overflow-hidden rounded-full
+                         bg-gradient-to-r from-indigo-600 to-blue-600 px-9 py-3 font-medium text-white
+                         shadow-lg transition active:scale-95 focus-visible:outline-none
+                         focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              <span className="relative z-10">Hire&nbsp;me</span>
+              <ArrowRight size={18} className="relative z-10" />
+              <span className="absolute inset-0 -translate-x-full bg-white/25 blur-sm
+                               transition-transform duration-700 hover:translate-x-full" />
+            </a>
 
-              <motion.a
-                href="#projects"
-                className="btn-outline group flex items-center px-6 py-3 rounded-full border border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 hover:scale-105 transition-transform hover:text-blue-600"
-              >
-                View Projects
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-              </motion.a>
-            </div>
+            <a
+              href="#projects"
+              className="group relative inline-flex items-center gap-2 rounded-full border border-indigo-600
+                         px-9 py-3 font-medium text-indigo-600 transition
+                         hover:bg-indigo-600 hover:text-white active:scale-95
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              <span className="relative z-10">View&nbsp;projects</span>
+              <ArrowRight size={18} className="relative z-10 transition-transform group-hover:translate-x-1" />
+            </a>
           </div>
         </motion.div>
 
-        {/* Interactive Avatar + Floating Icons */}
+        {/* avatar second on mobile (below text) ------------------ */}
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative hidden lg:block"
+          style={{ rotateX: rX, rotateY: rY }}
+          className="relative w-56 shrink-0 sm:w-64 md:w-72 lg:w-80"
         >
-          <div
-            className="relative w-full h-[500px]"
-            style={{
-              transform: `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`,
-              transition: "transform 0.2s ease",
-            }}
-          >
-            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500 rounded-full filter blur-3xl opacity-25 animate-pulse-slow"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-400 rounded-full filter blur-3xl opacity-25 animate-pulse-slow"></div>
+          {/* halo */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+            className="absolute inset-0 -z-10 rounded-full
+                       bg-gradient-to-br from-indigo-600 via-blue-600 to-fuchsia-600 opacity-25 blur-2xl"
+          />
 
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative w-64 h-64 md:w-80 md:h-80">
-                <motion.div
-                  className="absolute top-0 left-0 p-4 bg-white rounded-full shadow-lg"
-                  animate={logoWiggle}
-                >
-                  <Code size={30} className="text-blue-700" />
-                </motion.div>
-
-                <motion.div
-                  className="absolute bottom-0 right-0 p-4 bg-white rounded-full shadow-lg"
-                  animate={{ rotate: [0, 5, -5, 5, -5, 0], transition: { duration: 4, repeat: Infinity } }}
-                >
-                  <Database size={30} className="text-blue-700" />
-                </motion.div>
-
-                <motion.div
-                  className="absolute top-10 left-80 transform -translate-y-1/2 p-4 bg-white rounded-full shadow-lg"
-                  animate={{ scale: [1, 1.2, 1], transition: { repeat: Infinity, duration: 5 } }}
-                >
-                  <Globe size={30} className="text-blue-700" />
-                </motion.div>
-
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-32 h-32 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-blue-700 to-indigo-600 shadow-[0_0_50px_15px_rgba(59,130,246,0.5)] border-[6px] border-white overflow-hidden ">
-                    <Image
-                      src={Picture}
-                      alt="Profile"
-                      width={500}
-                      height={500}
-                      className="object-cover w-full h-full rounded-full hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* orbiting icons – hidden on very small screens */}
+          <div className="hidden sm:block">
+            <Float Icon={Code}     delay={0}  top="-12%" left="55%" />
+            <Float Icon={Database} delay={2}  bottom="-10%" right="2%" />
+            <Float Icon={Globe}    delay={4}  top="18%"  right="-14%" />
           </div>
+
+          {/* avatar */}
+          <motion.div
+            animate={{ scale: [1, 1.06, 1] }}
+            transition={{ repeat: Infinity, duration: 8 }}
+            className="relative rounded-full bg-gradient-to-br from-white to-slate-100 p-1 shadow-xl"
+          >
+            <Image
+              src={avatar}
+              alt="Afaq Ahmad – Full-Stack Developer"
+              priority
+              sizes="(max-width:768px) 220px, 320px"
+              className="h-full w-full rounded-full object-cover"
+            />
+          </motion.div>
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      {/* scroll cue ------------------------------------------- */}
+      <motion.button
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 1 }}
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-10"
+        transition={{ delay: 1.2 }}
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+        aria-label="Scroll"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-indigo-600 hover:text-indigo-700"
       >
-        <p className="text-gray-500 font-light mb-2">Scroll to discover the magic</p>
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-        >
-          <ChevronDown size={24} className="text-blue-600" />
-        </motion.div>
-      </motion.div>
-    </div>
+        <ChevronDown className="animate-bounce" />
+      </motion.button>
+    </section>
+  )
+}
+
+/* helper for floating icons */
+function Float({ Icon, delay = 0, ...pos }) {
+  return (
+    <motion.span
+      style={pos}
+      className="absolute flex h-10 w-10 items-center justify-center rounded-full bg-white shadow"
+      animate={{
+        y: [0, -8, 0],
+        boxShadow: [
+          "0 5px 15px rgba(0,0,0,0.04)",
+          "0 8px 20px rgba(0,0,0,0.08)",
+          "0 5px 15px rgba(0,0,0,0.04)"
+        ]
+      }}
+      transition={{ repeat: Infinity, duration: 5, delay }}
+    >
+      <Icon size={20} className="text-indigo-600" />
+    </motion.span>
   )
 }

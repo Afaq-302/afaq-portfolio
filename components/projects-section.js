@@ -1,10 +1,14 @@
 "use client"
 
-import { motion, useInView } from "framer-motion"
+/* ------------------------------------------------------------------
+ *  ProjectsSection – refreshed visuals & subtle motion
+ * ----------------------------------------------------------------*/
 import { useRef } from "react"
-import { ExternalLink, GitlabIcon as GitHub } from "lucide-react"
+import { motion, useInView } from "framer-motion"
+import { ExternalLink, Github } from "lucide-react"
 import Image from "next/image"
 
+/* project data (unchanged) */
 const projects = [
   {
     title: "Convertify Tool",
@@ -113,94 +117,141 @@ const projects = [
   },
 ];
 
-
 export default function ProjectsSection() {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.1 })
+  const inView = useInView(ref, { once: true, amount: 0.1 })
 
-  const containerVariants = {
+  /* stagger container */
+  const container = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+      transition: { staggerChildren: 0.2 }
+    }
   }
 
-  const itemVariants = {
+  /* each card */
+  const item = {
     hidden: { opacity: 0, y: 30 },
     visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
+      opacity: 1, y: 0,
+      transition: { duration: 0.6 }
+    }
   }
 
   return (
-    <div className="container mx-auto px-6 md:px-10" ref={ref}>
-      <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
-        <motion.h2 variants={itemVariants} className="section-title">
-          My Projects
-        </motion.h2>
+    <section id="projects" className="relative py-24">
+      {/* background accent blob */}
+      <span className="pointer-events-none absolute -top-32 right-1/2 h-[28rem] w-[28rem] translate-x-1/2 rounded-full
+                       bg-indigo-400/20 blur-3xl" />
 
-        <motion.p variants={itemVariants} className="text-center text-gray-700 max-w-2xl mx-auto mb-12">
-          Here are some of my recent projects. Each project is built with a focus on performance, user experience, and
-          clean code.
-        </motion.p>
+      <div ref={ref} className="container mx-auto px-6 md:px-10">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+        >
+          {/* heading */}
+          <motion.h2
+            variants={item}
+            className="mb-4 text-center text-3xl font-extrabold md:text-4xl"
+          >
+            Recent&nbsp;
+            <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-fuchsia-600
+                             bg-clip-text text-transparent">
+              Projects
+            </span>
+          </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.title}
-              variants={itemVariants}
-              className="project-card"
-              whileHover={{
-                scale: 1.03,
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              }}
-            >
-              <div className="relative h-60 w-full">
-                <Image src={project.image} alt={project.title} fill className="object-cover" />
-              </div>
+          {/* intro */}
+          <motion.p
+            variants={item}
+            className="mx-auto mb-14 max-w-2xl text-center text-lg text-slate-600"
+          >
+            A snapshot of the products I’ve shipped — each crafted with performance, accessibility,
+            and pixel-perfect UI in mind.
+          </motion.p>
 
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-blue-700">{project.title}</h3>
-                <p className="text-gray-700 mb-4">{project.description}</p>
+          {/* grid */}
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+            {projects.map(p => (
+              <motion.article
+                key={p.title}
+                variants={item}
+                whileHover={{ y: -4 }}
+                className="group rounded-2xl border border-slate-200 bg-white/60 shadow-sm backdrop-blur
+                           transition-shadow hover:shadow-lg"
+              >
+                {/* cover */}
+                <div className="relative h-56 overflow-hidden rounded-t-2xl">
+                  <Image
+                    src={p.image}
+                    alt={p.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.technologies.map((tech) => (
-                    <span key={tech} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                      {tech}
-                    </span>
-                  ))}
+                  {/* gradient overlay */}
+                  <span className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0
+                                   transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
-                <div className="flex space-x-4">
-                  <a
-                    href={project.demoLink}
-                    className="flex items-center text-blue-700 hover:text-blue-800 transition-colors"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink size={18} className="mr-1" />
-                    Live Demo
-                  </a>
-                  <a
-                    href={project.githubLink}
-                    className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <GitHub size={18} className="mr-1" />
-                    Source Code
-                  </a>
+                {/* content */}
+                <div className="p-6">
+                  <h3 className="mb-2 text-xl font-bold text-indigo-600">{p.title}</h3>
+                  <p className="mb-5 text-slate-700">{p.description}</p>
+
+                  {/* tech pills */}
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {p.technologies.map(t => (
+                      <span
+                        key={t}
+                        className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* CTAs */}
+                  <div className="flex flex-wrap gap-4">
+                    {/* main button */}
+                    <a
+                      href={p.demoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="relative inline-flex items-center gap-1 rounded-full bg-gradient-to-r
+                                 from-indigo-600 to-blue-600 px-5 py-2 text-sm font-medium text-white
+                                 shadow transition-all active:scale-95 focus-visible:outline-none
+                                 focus-visible:ring-2 focus-visible:ring-indigo-500"
+                    >
+                      <ExternalLink size={16} />
+                      Live&nbsp;Demo
+                      {/* shine */}
+                      <span className="absolute inset-0 -translate-x-full bg-white/20 blur-sm
+                                       transition-all duration-700 group-hover:translate-x-full" />
+                    </a>
+
+                    {/* secondary button */}
+                    <a
+                      href={p.githubLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded-full border border-slate-300
+                                 px-5 py-2 text-sm font-medium text-slate-700 transition-all
+                                 hover:border-indigo-400 hover:text-indigo-600 active:scale-95
+                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                    >
+                      <Github size={16} />
+                      Source
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    </div>
+              </motion.article>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
   )
 }

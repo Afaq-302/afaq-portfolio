@@ -1,97 +1,120 @@
 "use client"
 
+/* ------------------------------------------------------------------
+ *  PortfolioNavbar – glassy bar, bigger links, résumé CTA
+ * ----------------------------------------------------------------*/
 import { useState, useEffect } from "react"
-import { Menu, X } from "lucide-react"
-import { motion } from "framer-motion"
+import { Menu, X, FileText } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
-const navItems = [
-  { name: "Home", href: "#hero" },
-  { name: "About", href: "#about" },
-  { name: "Skills", href: "#skills" },
-  { name: "Projects", href: "#projects" },
+const links = [
+  { name: "Home",         href: "#hero" },
+  { name: "About",        href: "#about" },
+  { name: "Skills",       href: "#skills" },
+  { name: "Projects",     href: "#projects" },
   { name: "Testimonials", href: "#testimonials" },
-  { name: "Contact", href: "#contact" },
+  { name: "Contact",      href: "#contact" }
 ]
 
-export default function Navbar({ activeSection }) {
-  const [isOpen, setIsOpen] = useState(false)
+export default function PortfolioNavbar({ activeSection }) {
+  const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    const onScroll = () => setScrolled(window.scrollY > 50)
+    window.addEventListener("scroll", onScroll)
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  /* slide-down animation for mobile menu */
+  const slide = {
+    hidden:  { opacity: 0, height: 0 },
+    visible: { opacity: 1, height: "auto", transition: { duration: 0.35 } },
+    exit:    { opacity: 0, height: 0, transition: { duration: 0.25 } }
+  }
+
   return (
-    <motion.nav
-      initial={{ y: -100 }}
+    <motion.header
+      initial={{ y: -80 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
-      }`}
+      transition={{ duration: 0.6 }}
+      className={`fixed inset-x-0 top-0 z-50 backdrop-blur
+                  ${scrolled ? "bg-white/80 shadow-sm py-2" : "bg-transparent py-4"}`}
     >
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex justify-between items-center">
-          <a href="#hero" className="text-2xl font-bold text-blue-700">
-            Afaq<span className="text-gray-800">.dev</span>
-          </a>
+      {/* --- container --- */}
+      <div className="container mx-auto flex items-center justify-between px-6 md:px-10">
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`font-medium transition-all duration-200 ${
-                  activeSection === item.href.substring(1)
-                    ? "text-blue-700 font-bold"
-                    : "text-gray-700 hover:text-blue-700"
-                }`}
-              >
-                {item.name}
-              </a>
-            ))}
-          </div>
+        {/* logo / brand */}
+        <a
+          href="#hero"
+          className="text-2xl font-black tracking-tight text-indigo-600"
+        >
+          Afaq<span className="text-slate-800">.dev</span>
+        </a>
 
-          {/* Mobile Navigation Toggle */}
-          <button className="md:hidden text-gray-700 focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+        {/* desktop nav links */}
+        <nav className="hidden lg:flex items-center gap-12">
+          {links.map(l => (
+            <a
+              key={l.name}
+              href={l.href}
+              className={`group relative text-lg font-medium transition
+                          ${activeSection === l.href.slice(1)
+                            ? "text-indigo-600"
+                            : "text-slate-700 hover:text-indigo-600"}`}
+            >
+              {l.name}
+              {/* hover / active underline */}
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 w-full origin-left scale-x-0 bg-gradient-to-r
+                            from-indigo-600 to-blue-600 transition-transform duration-300
+                            group-hover:scale-x-100
+                            ${activeSection === l.href.slice(1) && "scale-x-100"}`}
+              />
+            </a>
+          ))}
+        </nav>
 
-        {/* Mobile Navigation Menu */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden mt-4 bg-white rounded-lg shadow-lg overflow-hidden"
+        {/* hamburger */}
+        <button
+          aria-label="Toggle navigation"
+          onClick={() => setOpen(prev => !prev)}
+          className="lg:hidden rounded-full p-2 transition hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          {open ? <X size={28} /> : <Menu size={28} />}
+        </button>
+      </div>
+
+      {/* mobile menu ------------------------------------------------ */}
+      <AnimatePresence>
+        {open && (
+          <motion.nav
+            variants={slide}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="lg:hidden bg-white/90 backdrop-blur shadow-inner"
           >
-            <div className="flex flex-col py-2">
-              {navItems.map((item) => (
+            <div className="flex flex-col divide-y divide-slate-100">
+              {links.map(l => (
                 <a
-                  key={item.name}
-                  href={item.href}
-                  className={`px-4 py-3 font-medium transition-all duration-200 ${
-                    activeSection === item.href.substring(1)
-                      ? "text-blue-700 bg-blue-50 font-bold"
-                      : "text-gray-700 hover:text-blue-700 hover:bg-gray-50"
-                  }`}
-                  onClick={() => setIsOpen(false)}
+                  key={l.name}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className={`px-6 py-5 text-base font-medium transition
+                              ${activeSection === l.href.slice(1)
+                                ? "bg-indigo-50 text-indigo-700"
+                                : "text-slate-700 hover:bg-slate-50 hover:text-indigo-600"}`}
                 >
-                  {item.name}
+                  {l.name}
                 </a>
               ))}
+              {/* resume link mobile */}
+             
             </div>
-          </motion.div>
+          </motion.nav>
         )}
-      </div>
-    </motion.nav>
+      </AnimatePresence>
+    </motion.header>
   )
 }
