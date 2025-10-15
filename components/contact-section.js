@@ -1,106 +1,80 @@
-"use client"
+"use client";
 
-import { useRef, useState } from "react"
-import { motion, useInView } from "framer-motion"
-import { Mail, Phone, Send, Github, Linkedin } from "lucide-react"
+import { useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { Mail, Phone, Send, Github, Linkedin } from "lucide-react";
 
-const WEB3FORMS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY // required
-const SUBJECT = "New Site Message"
-const TO_EMAIL = "ufaq3022@gmail.com" // final recipient (included inside message body)
-const MIN_WORDS = 3
-const MIN_CHARS = 20
+const MIN_WORDS = 3;
+const MIN_CHARS = 20;
 
 export default function ContactSection() {
-  const ref = useRef(null)
-  const appears = useInView(ref, { once: true, amount: 0.25 })
+  const ref = useRef(null);
+  const appears = useInView(ref, { once: true, amount: 0.25 });
 
-  const [form, setForm] = useState({ name: "", email: "", message: "" })
-  const [sending, setSending] = useState(false)
-  const [done, setDone] = useState(false)
-  const [error, setError] = useState(null)
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    if (error) setError(null)
-  }
+    setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
+  };
 
   const isValidMessage = (msg) => {
-    const words = msg.trim().split(/\s+/).filter(Boolean).length
-    return words >= MIN_WORDS || msg.trim().length >= MIN_CHARS
-  }
+    const words = msg.trim().split(/\s+/).filter(Boolean).length;
+    return words >= MIN_WORDS || msg.trim().length >= MIN_CHARS;
+  };
 
-  const handleSubmit = async (e64f6810b32d) => {
-    e.preventDefault()
-    setError(null)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-    if (!WEB3FORMS_KEY) {
-      setError("Email service not configured. Please set NEXT_PUBLIC_WEB3FORMS_KEY.")
-      return
-    }
     if (!form.name.trim() || !form.email.trim()) {
-      setError("Please enter your name and email.")
-      return
+      setError("Please enter your name and email.");
+      return;
     }
     if (!isValidMessage(form.message)) {
-      setError("Please write a longer message (at least 3 words / 20+ chars).")
-      return
+      setError("Please write a longer message (at least 3 words / 20+ chars).");
+      return;
     }
 
-    setSending(true)
-    const start = Date.now()
-
-    // pad to avoid spam filters trimming trailing spaces
-    const pad = "\u00A0".repeat(10)
-    const modified = [
-      `From: ${form.name} <${form.email}>`,
-      `To: ${TO_EMAIL}`,
-      "",
-      `Message: ${form.message.trim()}${pad}`,
-    ].join("\n")
-
-    const fd = new FormData()
-    fd.append("access_key", WEB3FORMS_KEY)
-    fd.append("subject", SUBJECT)
-    fd.append("from_name", form.name || "Portfolio Contact")
-    fd.append("from_email", form.email || "no-reply@example.com")
-    fd.append("message", modified)
+    setSending(true);
+    const start = Date.now();
 
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        body: fd,
-        headers: { Accept: "application/json" },
-      })
-      const data = await res.json()
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-      // ensure at least 3s total UX
-      const elapsed = Date.now() - start
-      const delay = Math.max(3000 - elapsed, 0)
+      const elapsed = Date.now() - start;
+      const delay = Math.max(800 - elapsed, 0); // small UX delay
 
-      setTimeout(() => {
-        if (data && data.success) {
-          setDone(true)
-          setForm({ name: "", email: "", message: "" })
-          setTimeout(() => setDone(false), 5000)
+      setTimeout(async () => {
+        if (res.ok) {
+          setDone(true);
+          setForm({ name: "", email: "", message: "" });
+          setTimeout(() => setDone(false), 5000);
         } else {
-          setError((data && (data.message || data.error)) || "Submission failed.")
+          const txt = await res.text().catch(() => "");
+          setError(txt || "Submission failed.");
         }
-        setSending(false)
-      }, delay)
-    } catch (err) {
-      console.error("Form submit failed", err)
-      const elapsed = Date.now() - start
-      const delay = Math.max(3000 - elapsed, 0)
+        setSending(false);
+      }, delay);
+    } catch {
+      const elapsed = Date.now() - start;
+      const delay = Math.max(800 - elapsed, 0);
       setTimeout(() => {
-        setError("Network error – please try again.")
-        setSending(false)
-      }, delay)
+        setError("Network error – please try again.");
+        setSending(false);
+      }, delay);
     }
-  }
+  };
 
   /* animations */
-  const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.15 } } }
-  const item = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: .5 } } }
+  const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.15 } } };
+  const item = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
   return (
     <section id="contact" className="relative py-28">
@@ -119,7 +93,7 @@ export default function ContactSection() {
           </motion.p>
 
           <div className="grid gap-14 md:grid-cols-2">
-            {/* info card (unchanged) */}
+            {/* info card */}
             <motion.div variants={item} className="rounded-3xl border border-slate-200 bg-white/60 p-10 backdrop-blur">
               <h3 className="mb-8 text-2xl font-bold text-indigo-600">Contact&nbsp;Info</h3>
               <ul className="space-y-8">
@@ -173,7 +147,7 @@ export default function ContactSection() {
             <motion.div variants={item} className="rounded-3xl border border-slate-200 bg-white/60 p-10 backdrop-blur">
               <h3 className="mb-8 text-2xl font-bold text-indigo-600">Send&nbsp;a&nbsp;Message</h3>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 {["name", "email"].map((f) => (
                   <div key={f}>
                     <label htmlFor={f} className="mb-2 block text-sm font-medium text-slate-700 capitalize">
@@ -183,7 +157,7 @@ export default function ContactSection() {
                       id={f}
                       name={f}
                       type={f === "email" ? "email" : "text"}
-                      value={form[f]}
+                      value={(form)[f]}
                       onChange={handleChange}
                       required
                       className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
@@ -210,8 +184,8 @@ export default function ContactSection() {
 
                 <motion.button
                   type="submit"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: sending ? 1 : 1.03 }}
+                  whileTap={{ scale: sending ? 1 : 0.96 }}
                   disabled={sending}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r
                              from-indigo-600 to-blue-600 px-6 py-3 text-sm font-medium text-white
@@ -244,10 +218,9 @@ export default function ContactSection() {
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
                     className="rounded-lg bg-green-100 px-4 py-3 text-center text-sm font-medium text-green-700"
                   >
-                    Thanks! I’ll reply soon.
+                    ✅ Your message was sent. We’ll contact you shortly.
                   </motion.div>
                 )}
               </form>
@@ -256,5 +229,5 @@ export default function ContactSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
