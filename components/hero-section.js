@@ -17,11 +17,17 @@ export default function HeroSection() {
     const t = new Typed(typedRef.current, {
       strings: [
         "Full-Stack&nbsp;Developer",
-        "Shopify&nbsp;Expert",
-        "Next.js&nbsp;Lover"
+        "Next.js&nbsp;Engineer",
+        "Frontend&nbsp;Expert",
+        "HTML&nbsp;&amp;&nbsp;CSS&nbsp;Old-School&nbsp;Survivor",
+        "Pixel-Perfect&nbsp;UI&nbsp;Tinkerer",
+        "Design&nbsp;Wizard",
+        "SaaS&nbsp;Builder&nbsp;&amp;&nbsp;Automation&nbsp;Geek",
+        "API&nbsp;Whisperer",
       ],
-      typeSpeed: 60,
-      backSpeed: 30,
+
+      typeSpeed: 40,
+      backSpeed: 20,
       backDelay: 1800,
       loop: true
     })
@@ -65,14 +71,14 @@ export default function HeroSection() {
             YOU’RE IN ELITE TERRITORY
           </p>
 
-         <h1 className="mb-5 text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
+          <h1 className="mb-5 text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
             Hi, I’m{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-fuchsia-600 bg-clip-text text-transparent">
               Afaq&nbsp;Ahmad
             </span>
           </h1>
 
-         <h2 className="mb-8 text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-700">
+          <h2 className="mb-8 text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-700">
             <span ref={typedRef} className="underline decoration-indigo-500 underline-offset-4" />
           </h2>
 
@@ -124,9 +130,9 @@ export default function HeroSection() {
 
           {/* orbiting icons – hidden on very small screens */}
           <div className="hidden sm:block">
-            <Float Icon={Code}     delay={0}  top="-12%" left="55%" />
-            <Float Icon={Database} delay={2}  bottom="-10%" right="2%" />
-            <Float Icon={Globe}    delay={4}  top="18%"  right="-14%" />
+            <Float Icon={Code} delay={0} top="-12%" left="55%" />
+            <Float Icon={Database} delay={2} bottom="-10%" right="2%" />
+            <Float Icon={Globe} delay={4} top="18%" right="-14%" />
           </div>
 
           {/* avatar */}
